@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="$(MSBuildThisFileDirectory)/Package.props" />
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <PackageId>Webinex.Flippo.All</PackageId>
+    <RootNamespace>Webinex.Flippo.All</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Webinex.Flippo.Abstractions\Webinex.Flippo.Abstractions.csproj" />
+    <ProjectReference Include="..\Webinex.Flippo.AspNetCore\Webinex.Flippo.AspNetCore.csproj" />
+    <ProjectReference Include="..\Webinex.Flippo.AzureBlob\Webinex.Flippo.AzureBlob.csproj" />
+    <ProjectReference Include="..\Webinex.Flippo\Webinex.Flippo.csproj" />
+  </ItemGroup>
+
+</Project>

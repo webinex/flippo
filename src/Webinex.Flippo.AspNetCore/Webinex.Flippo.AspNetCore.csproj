@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="$(MSBuildThisFileDirectory)/../Webinex.Flippo.All/Package.props" />
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <PackageId>Webinex.Flippo.AspNetCore</PackageId>
+    <RootNamespace>Webinex.Flippo.AspNetCore</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Webinex.Flippo.Abstractions\Webinex.Flippo.Abstractions.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Webinex.Coded.AspNetCore" Version="1.0.0" />
+  </ItemGroup>
+
+</Project>
