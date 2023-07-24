@@ -89,7 +89,7 @@
 }
 
 .file-list .file-list-item .file-list-item-ref {
-  font-size: .75em;
+  font-size: 0.75em;
   color: #9e9e9e;
 }
 
@@ -97,8 +97,67 @@
   margin-top: 0.5rem;
 }
 
+.file-list .file-list-item .file-list-item-head {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: space-between;
+}
+.file-list .file-list-item .file-list-item-head .btn-icon {
+  margin-left: 20px;
+}
+
 @keyframes spinner {
   to {
     transform: rotate(360deg);
   }
+}
+
+#toast_container {
+  position: fixed;
+  top: 10%;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+#toast_container .toast {
+  background-color: white;
+  padding: 1rem 2rem;
+  border-radius: 3px;
+  border: 1px solid #9e9e9e;
+  width: 100%;
+  display: block;
+}
+
+#toast_container .toast + .toast {
+  margin-top: 15px;
+}
+
+button.btn-link {
+  padding: 0;
+  background-color: transparent;
+  color: rgb(0, 0, 238);
+  outline: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  text-decoration: underline;
+}
+
+button.btn-link:hover {
+  text-decoration: none;
+}
+
+button.btn-icon {
+  font-family: monospace;
+  background: transparent;
+  background-color: transparent;
+  border: none;
+  padding: 0;
+  outline: none;
+  color: #9e9e9e;
+  cursor: pointer;
+}
+
+button.btn-icon:hover {
+  color: black;
 }

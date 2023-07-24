@@ -16,20 +16,66 @@ const DEFAULT_OPTIONS: FlippoOptions = {
   }),
 };
 
-class FlippoHttp {
+export class Flippo {
+  private _options: FlippoOptions;
   private _axios: AxiosInstance;
 
-  constructor(axios: AxiosInstance) {
-    if (axios == null) throw new Error('`axios` might not be null');
-
-    this._axios = axios;
+  constructor(options: FlippoOptions = DEFAULT_OPTIONS) {
+    this._options = { ...DEFAULT_OPTIONS, ...options };
+    this._axios = this._options.axios!;
   }
 
-  public store = async (args: FlippoStoreArgs): Promise<string> => {
-    if (args == null) throw new Error('`args` might not be null');
-    if (args.file == null) throw new Error('`args.file` might not be null');
+  public fetch = async (
+    reference: string,
+    cacheControlMaxAge?: number,
+    etag?: boolean
+  ): Promise<Blob> => {
+    if (!reference) {
+      throw new Error('`reference` might not be null');
+    }
 
-    const { file, reference, replace } = args;
+    const searchParams = new URLSearchParams();
+
+    if (cacheControlMaxAge !== undefined) {
+      searchParams.append('cacheControlMaxAge', cacheControlMaxAge.toString());
+    }
+
+    if (etag !== undefined) {
+      searchParams.append('etag', etag.toString());
+    }
+
+    const response = await this._axios({
+      url: reference + '?' + searchParams.toString(),
+      method: 'GET',
+      responseType: 'blob',
+    });
+
+    const data: Blob = response.data;
+    return data;
+  };
+
+  public getSasToken = async (reference: string): Promise<string> => {
+    if (!reference) throw new Error('`reference` might not be null');
+
+    const { data } = await this._axios.get(`${reference}/sas-token`);
+    return data;
+  };
+
+  public getSasUrl = async (reference: string): Promise<string> => {
+    const token = await this.getSasToken(reference);
+
+    return (
+      this._options.axios!.defaults.baseURL! +
+      `/${reference}/open?token=${encodeURIComponent(token)}`
+    );
+  };
+
+  public store = async (
+    fileOrArgs: File | FlippoStoreArgs
+  ): Promise<string> => {
+    const { file, reference, replace } = !(fileOrArgs instanceof File)
+      ? fileOrArgs
+      : { file: fileOrArgs, replace: false, reference: undefined };
 
     const form = new FormData();
     form.append('file', file);
@@ -48,86 +94,9 @@ class FlippoHttp {
     return response.data;
   };
 
-  public getSasToken = async (reference: string): Promise<string> => {
-    if (!reference) throw new Error('`reference` might not be null');
-
-    const { data } = await this._axios.get(`${reference}/sas-token`);
-    return data;
-  };
-
-  public fetch = async (reference: string): Promise<Blob> => {
-    if (!reference) throw new Error('`reference` might not be null');
-
-    const response = await this._axios({
-      url: reference,
-      method: 'GET',
-      responseType: 'blob',
-    });
-
-    const data: Blob = response.data;
-    return data;
-  };
-
   public delete = async (reference: string): Promise<void> => {
     if (!reference) throw new Error('`reference` might not be null');
 
     await this._axios.delete(reference);
-  };
-}
-
-export class Flippo {
-  private _http: FlippoHttp;
-  private _options: FlippoOptions;
-
-  constructor(options: FlippoOptions = DEFAULT_OPTIONS) {
-    this._options = { ...DEFAULT_OPTIONS, ...options };
-
-    this._http = new FlippoHttp(this._options.axios);
-  }
-
-  public fetch = async (reference: string): Promise<Blob> => {
-    if (reference == null) throw new Error('`reference` might not be null');
-
-    return await this._http.fetch(reference);
-  };
-
-  public getSasToken = async (reference: string): Promise<string> => {
-    if (!reference) throw new Error('`reference` might not be null');
-
-    return await this._http.getSasToken(reference);
-  };
-
-  public getSasUrl = async (reference: string): Promise<string> => {
-    const token = await this._http.getSasToken(reference);
-
-    return (
-      this._options.axios!.defaults.baseURL! +
-      `/${reference}/open?token=${encodeURIComponent(token)}`
-    );
-  };
-
-  public store = async (
-    fileOrArgs: File | FlippoStoreArgs
-  ): Promise<string> => {
-    if (fileOrArgs == null) throw new Error('`fileOrArgs` might not be null');
-
-    const args = this.storeArgs(fileOrArgs);
-    return await this._http.store(args);
-  };
-
-  private storeArgs = (fileOrArgs: File | FlippoStoreArgs): FlippoStoreArgs => {
-    if (fileOrArgs instanceof File) {
-      return { file: fileOrArgs };
-    }
-
-    if (fileOrArgs.file == null)
-      throw new Error('`fileOrArgs.file` might not be null');
-    return fileOrArgs;
-  };
-
-  public delete = async (reference: string): Promise<void> => {
-    if (!reference) throw new Error('`reference` might not be null');
-
-    return await this._http.delete(reference);
   };
 }

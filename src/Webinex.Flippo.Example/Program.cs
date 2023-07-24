@@ -1,3 +1,4 @@
+using Webinex.Coded.AspNetCore;
 using Webinex.Flippo;
 using Webinex.Flippo.AspNetCore;
 
@@ -9,6 +10,7 @@ builder.Configuration.AddJsonFile("appsettings.Personal.json", optional: false);
 // Add services to the container.
 
 builder.Services
+    .AddCodedFailures()
     .AddControllers()
     .AddFlippoController();
 
