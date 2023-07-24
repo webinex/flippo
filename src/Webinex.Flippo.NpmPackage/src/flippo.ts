@@ -48,6 +48,13 @@ class FlippoHttp {
     return response.data;
   };
 
+  public getSasToken = async (reference: string): Promise<string> => {
+    if (!reference) throw new Error('`reference` might not be null');
+
+    const { data } = await this._axios.get(`${reference}/sas-token`);
+    return data;
+  };
+
   public fetch = async (reference: string): Promise<Blob> => {
     if (!reference) throw new Error('`reference` might not be null');
 
@@ -70,17 +77,33 @@ class FlippoHttp {
 
 export class Flippo {
   private _http: FlippoHttp;
+  private _options: FlippoOptions;
 
   constructor(options: FlippoOptions = DEFAULT_OPTIONS) {
-    options = { ...DEFAULT_OPTIONS, ...options };
+    this._options = { ...DEFAULT_OPTIONS, ...options };
 
-    this._http = new FlippoHttp(options.axios);
+    this._http = new FlippoHttp(this._options.axios);
   }
 
   public fetch = async (reference: string): Promise<Blob> => {
     if (reference == null) throw new Error('`reference` might not be null');
 
     return await this._http.fetch(reference);
+  };
+
+  public getSasToken = async (reference: string): Promise<string> => {
+    if (!reference) throw new Error('`reference` might not be null');
+
+    return await this._http.getSasToken(reference);
+  };
+
+  public getSasUrl = async (reference: string): Promise<string> => {
+    const token = await this._http.getSasToken(reference);
+
+    return (
+      this._options.axios!.defaults.baseURL! +
+      `/${reference}/open?token=${encodeURIComponent(token)}`
+    );
   };
 
   public store = async (

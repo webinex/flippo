@@ -12,6 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.32.0" />
     <PackageReference Include="Webinex.Coded.AspNetCore" Version="1.0.0" />
   </ItemGroup>
 

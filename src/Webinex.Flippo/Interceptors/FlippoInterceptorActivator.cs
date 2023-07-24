@@ -60,6 +60,20 @@ namespace Webinex.Flippo.Interceptors
             return _interceptor.OnMoveAsync(args, next);
         }
 
+        public Task<CodedResult<string>> GetSasTokenAsync(FlippoGetSasTokenArgs args)
+        {
+            args = args ?? throw new ArgumentNullException(nameof(args));
+            var next = new NextDelegate<FlippoGetSasTokenArgs, CodedResult<string>>(x => _flippo.GetSasTokenAsync(x));
+            return _interceptor.OnGetSasTokenAsync(args, next);
+        }
+
+        public Task<CodedResult> VerifySasTokenAsync(FlippoVerifySasTokenArgs args)
+        {
+            args = args ?? throw new ArgumentNullException(nameof(args));
+            var next = new NextDelegate<FlippoVerifySasTokenArgs, CodedResult>(x => _flippo.VerifySasTokenAsync(x));
+            return _interceptor.OnVerifySasTokenAsync(args, next);
+        }
+
         private class NextDelegate<TArgs, TResult> : INext<TArgs, TResult>
         {
             private readonly Func<TArgs, Task<TResult>> _delegate;

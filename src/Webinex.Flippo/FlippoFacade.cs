@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Webinex.Coded;
@@ -48,6 +49,18 @@ namespace Webinex.Flippo
         {
             args = args ?? throw new ArgumentNullException(nameof(args));
             return _interceptable.MoveAsync(args, cancel);
+        }
+
+        public Task<CodedResult<string>> GetSasTokenAsync(FlippoGetSasTokenArgs args)
+        {
+            args = args ?? throw new ArgumentNullException(nameof(args));
+            return _interceptable.GetSasTokenAsync(args);
+        }
+
+        public Task<CodedResult> VerifySasTokenAsync(FlippoVerifySasTokenArgs args)
+        {
+            args = args ?? throw new ArgumentNullException(nameof(args));
+            return _interceptable.VerifySasTokenAsync(args);
         }
     }
 }
