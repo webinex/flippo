@@ -13,10 +13,12 @@ namespace Webinex.Flippo
     internal class FlippoInterceptable : IFlippoInterceptable
     {
         private readonly IFlippoBlobStore _blob;
+        private readonly IFlippoSasTokenService _sasTokenService;
 
-        public FlippoInterceptable(IFlippoBlobStore blob)
+        public FlippoInterceptable(IFlippoBlobStore blob, IFlippoSasTokenService sasTokenService)
         {
             _blob = blob;
+            _sasTokenService = sasTokenService;
         }
 
         public async Task<CodedResult<string>> StoreAsync(FlippoStoreArgs args, CancellationToken cancel = default)
@@ -109,6 +111,16 @@ namespace Webinex.Flippo
             cancel.ThrowIfCancellationRequested();
             await _blob.MoveAsync(args.FromReference, args.ToReference, args.Values, cancel);
             return CodedResults.Success();
+        }
+
+        public Task<CodedResult<string>> GetSasTokenAsync(FlippoGetSasTokenArgs args)
+        {
+            return _sasTokenService.GetSasTokenAsync(args.References);
+        }
+
+        public Task<CodedResult> VerifySasTokenAsync(FlippoVerifySasTokenArgs args)
+        {
+            return _sasTokenService.VerifySasTokenAsync(args.Token, args.References);
         }
     }
 }

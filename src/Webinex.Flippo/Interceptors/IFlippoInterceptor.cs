@@ -72,6 +72,20 @@ namespace Webinex.Flippo.Interceptors
         Task<CodedResult> OnMoveAsync(
             [NotNull] FlippoMoveArgs args,
             [NotNull] INext<FlippoMoveArgs, CodedResult> next);
+
+        /// <summary>
+        ///     Interceptor for <see cref="IFlippo.GetSasTokenAsync"/>
+        /// </summary>
+        Task<CodedResult<string>> OnGetSasTokenAsync(
+            [NotNull] FlippoGetSasTokenArgs args,
+            [NotNull] INext<FlippoGetSasTokenArgs, CodedResult<string>> next);
+
+        /// <summary>
+        ///     Interceptor for <see cref="IFlippo.VerifySasTokenAsync"/>
+        /// </summary>
+        Task<CodedResult> OnVerifySasTokenAsync(
+            [NotNull] FlippoVerifySasTokenArgs args,
+            [NotNull] INext<FlippoVerifySasTokenArgs, CodedResult> next);
     }
 
     public class FlippoInterceptor : IFlippoInterceptor
@@ -109,6 +123,18 @@ namespace Webinex.Flippo.Interceptors
         public Task<CodedResult> OnMoveAsync(FlippoMoveArgs args, INext<FlippoMoveArgs, CodedResult> next)
         {
             args = args ?? throw new ArgumentNullException();
+            return next.InvokeAsync(args);
+        }
+
+        public Task<CodedResult<string>> OnGetSasTokenAsync(FlippoGetSasTokenArgs args, INext<FlippoGetSasTokenArgs, CodedResult<string>> next)
+        {
+            args = args ?? throw new ArgumentNullException(nameof(args));
+            return next.InvokeAsync(args);
+        }
+
+        public Task<CodedResult> OnVerifySasTokenAsync(FlippoVerifySasTokenArgs args, INext<FlippoVerifySasTokenArgs, CodedResult> next)
+        {
+            args = args ?? throw new ArgumentNullException(nameof(args));
             return next.InvokeAsync(args);
         }
     }

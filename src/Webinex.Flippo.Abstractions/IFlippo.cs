@@ -21,6 +21,8 @@ namespace Webinex.Flippo
         Task<CodedResult> CopyAsync([NotNull] FlippoCopyArgs args, CancellationToken cancel = default);
 
         Task<CodedResult> MoveAsync([NotNull] FlippoMoveArgs args, CancellationToken cancel = default);
+        Task<CodedResult<string>> GetSasTokenAsync([NotNull] FlippoGetSasTokenArgs args);
+        Task<CodedResult> VerifySasTokenAsync([NotNull] FlippoVerifySasTokenArgs args);
     }
 
     public static class FlippoExtensions
@@ -107,6 +109,32 @@ namespace Webinex.Flippo
 
             var moveArgs = new FlippoCopyArgs(fromReference, toReference, replace, values);
             return flippo.CopyAsync(moveArgs, cancel);
+        }
+
+        public static Task<CodedResult<string>> GetSasTokenAsync(this IFlippo flippo, [NotNull] IEnumerable<string> references)
+        {
+            return flippo.GetSasTokenAsync(new FlippoGetSasTokenArgs(references));
+        }
+
+        public static Task<CodedResult<string>> GetSasTokenAsync(this IFlippo flippo, [NotNull] string reference)
+        {
+            return flippo.GetSasTokenAsync(new FlippoGetSasTokenArgs(new[] { reference }));
+        }
+
+        public static Task<CodedResult> VerifySasTokenAsync(
+            this IFlippo flippo,
+            [NotNull] string token,
+            [NotNull] IEnumerable<string> references)
+        {
+            return flippo.VerifySasTokenAsync(new FlippoVerifySasTokenArgs(token, references));
+        }
+
+        public static Task<CodedResult> VerifySasTokenAsync(
+            this IFlippo flippo,
+            [NotNull] string token,
+            [NotNull] string reference)
+        {
+            return flippo.VerifySasTokenAsync(new FlippoVerifySasTokenArgs(token, new[] { reference }));
         }
     }
 }

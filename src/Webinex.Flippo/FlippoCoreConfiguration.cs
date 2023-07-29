@@ -9,6 +9,14 @@ using Webinex.Flippo.Interceptors.Impls;
 
 namespace Webinex.Flippo
 {
+    public interface IFlippoCoreSettings
+    {
+        [MaybeNull]
+        string SasTokenSecret { get; }
+
+        TimeSpan? SasTokenTimeToLive { get; }
+    }
+
     public interface IFlippoInterceptorsConfiguration
     {
         IFlippoCoreConfiguration Configuration { get; }
@@ -25,9 +33,12 @@ namespace Webinex.Flippo
         [NotNull] IFlippoInterceptorsConfiguration Interceptors { get; }
 
         IFlippoCoreConfiguration AddFileSystemBlob([NotNull] string basePath);
+
+        IFlippoCoreConfiguration UseSasToken([NotNull] string secret, TimeSpan timeToLive);
     }
 
-    internal class FlippoCoreConfiguration : IFlippoCoreConfiguration, IFlippoInterceptorsConfiguration
+    internal class FlippoCoreConfiguration : IFlippoCoreConfiguration, IFlippoInterceptorsConfiguration,
+        IFlippoCoreSettings
     {
         private FlippoCoreConfiguration(IServiceCollection services)
         {
@@ -35,7 +46,9 @@ namespace Webinex.Flippo
 
             services
                 .AddScoped<IFlippo, FlippoFacade>()
-                .AddScoped<IFlippoInterceptable, FlippoInterceptable>();
+                .AddScoped<IFlippoInterceptable, FlippoInterceptable>()
+                .AddSingleton<IFlippoCoreSettings>(this)
+                .AddSingleton<IFlippoSasTokenService, FlippoSasTokenService>();
         }
 
         public static FlippoCoreConfiguration GetOrCreate([NotNull] IServiceCollection services)
@@ -56,6 +69,11 @@ namespace Webinex.Flippo
 
         public IServiceCollection Services { get; }
         public IDictionary<string, object> Values { get; } = new Dictionary<string, object>();
+
+        [MaybeNull]
+        public string SasTokenSecret { get; private set; }
+        public TimeSpan? SasTokenTimeToLive { get; private set; }
+
         public IFlippoInterceptorsConfiguration Interceptors => this;
 
         public IFlippoCoreConfiguration AddFileSystemBlob(string basePath)
@@ -69,6 +87,14 @@ namespace Webinex.Flippo
 
             Services.AddSingleton(new FileSystemBlobSettings(basePath));
             Services.AddScoped<IFlippoBlobStore, FileSystemBlobStore>();
+            return this;
+        }
+
+        public IFlippoCoreConfiguration UseSasToken(string secret, TimeSpan timeToLive)
+        {
+            secret = secret ?? throw new ArgumentNullException(nameof(secret));
+            SasTokenSecret = secret;
+            SasTokenTimeToLive = timeToLive;
             return this;
         }
 
