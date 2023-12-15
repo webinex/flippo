@@ -5,14 +5,15 @@ using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 
 namespace Webinex.Flippo
 {
     internal class FileSystemBlobStore : IFlippoBlobStore
     {
-        private readonly FileSystemBlobSettings _settings;
+        private readonly IOptions<FileSystemBlobSettings> _settings;
 
-        public FileSystemBlobStore(FileSystemBlobSettings settings)
+        public FileSystemBlobStore(IOptions<FileSystemBlobSettings> settings)
         {
             _settings = settings;
         }
@@ -109,7 +110,7 @@ namespace Webinex.Flippo
         private string FilePath(string fileName)
         {
             fileName = fileName ?? throw new ArgumentNullException(nameof(fileName));
-            return Path.Combine(_settings.BasePath, fileName);
+            return Path.Combine(_settings.Value.BasePath, fileName);
         }
 
         private string ManifestFileName(string fileName)

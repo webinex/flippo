@@ -26,13 +26,17 @@ namespace Webinex.Flippo
 
     public interface IFlippoCoreConfiguration
     {
-        [NotNull] IServiceCollection Services { get; }
+        [NotNull]
+        IServiceCollection Services { get; }
 
-        [NotNull] IDictionary<string, object> Values { get; }
+        [NotNull]
+        IDictionary<string, object> Values { get; }
 
-        [NotNull] IFlippoInterceptorsConfiguration Interceptors { get; }
+        [NotNull]
+        IFlippoInterceptorsConfiguration Interceptors { get; }
 
         IFlippoCoreConfiguration AddFileSystemBlob([NotNull] string basePath);
+        IFlippoCoreConfiguration AddFileSystemBlob([NotNull] Action<FileSystemBlobSettings> configure);
 
         IFlippoCoreConfiguration UseSasToken([NotNull] string secret, TimeSpan timeToLive);
     }
@@ -72,6 +76,7 @@ namespace Webinex.Flippo
 
         [MaybeNull]
         public string SasTokenSecret { get; private set; }
+
         public TimeSpan? SasTokenTimeToLive { get; private set; }
 
         public IFlippoInterceptorsConfiguration Interceptors => this;
@@ -85,8 +90,19 @@ namespace Webinex.Flippo
             if (!Directory.Exists(basePath))
                 Directory.CreateDirectory(basePath);
 
-            Services.AddSingleton(new FileSystemBlobSettings(basePath));
-            Services.AddScoped<IFlippoBlobStore, FileSystemBlobStore>();
+            return AddFileSystemBlob(settings => { settings.BasePath = basePath; });
+        }
+
+        public IFlippoCoreConfiguration AddFileSystemBlob(Action<FileSystemBlobSettings> configure)
+        {
+            configure = configure ?? throw new ArgumentNullException(nameof(configure));
+
+            Services
+                .AddOptions<FileSystemBlobSettings>()
+                .Configure(configure)
+                .Services
+                .AddScoped<IFlippoBlobStore, FileSystemBlobStore>();
+
             return this;
         }
 

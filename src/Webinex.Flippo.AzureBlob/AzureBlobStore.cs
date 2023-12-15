@@ -7,6 +7,7 @@ using Azure;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Azure.Storage.Sas;
+using Microsoft.Extensions.Options;
 
 namespace Webinex.Flippo.AzureBlob
 {
@@ -15,10 +16,10 @@ namespace Webinex.Flippo.AzureBlob
         private readonly TimeSpan SAS_TIMESPAN = TimeSpan.FromSeconds(30);
         private readonly Lazy<BlobContainerClient> _clientLazy;
 
-        public AzureBlobStore(AzureBlobSettings settings)
+        public AzureBlobStore(IOptions<AzureBlobSettings> settings)
         {
             _clientLazy = new Lazy<BlobContainerClient>(() =>
-                new BlobContainerClient(settings.ConnectionString, settings.Container));
+                new BlobContainerClient(settings.Value.ConnectionString, settings.Value.Container));
         }
 
         private BlobContainerClient Client => _clientLazy.Value;
