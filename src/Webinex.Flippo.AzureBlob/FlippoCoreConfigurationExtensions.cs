@@ -16,7 +16,7 @@ namespace Webinex.Flippo.AzureBlob
             container = container ?? throw new ArgumentNullException(nameof(container));
 
             var settings = new AzureBlobSettings(connectionString, container);
-            configuration.Services.AddSingleton(settings);
+            configuration.Services.AddScoped(_ => settings);
             configuration.Services.AddScoped<IFlippoBlobStore, AzureBlobStore>();
 
             return configuration;

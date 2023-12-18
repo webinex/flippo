@@ -3,7 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Webinex.Flippo
 {
-    internal class FileSystemBlobSettings
+    public class FileSystemBlobSettings
     {
         public FileSystemBlobSettings([NotNull] string basePath)
         {
