@@ -85,7 +85,7 @@ namespace Webinex.Flippo
             if (!Directory.Exists(basePath))
                 Directory.CreateDirectory(basePath);
 
-            Services.AddSingleton(new FileSystemBlobSettings(basePath));
+            Services.AddScoped(_ => new FileSystemBlobSettings(basePath));
             Services.AddScoped<IFlippoBlobStore, FileSystemBlobStore>();
             return this;
         }
