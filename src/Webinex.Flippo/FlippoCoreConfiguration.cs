@@ -11,6 +11,9 @@ namespace Webinex.Flippo
 {
     public interface IFlippoCoreSettings
     {
+        /// <summary>
+        /// Secret for SAS token. Must be greater or equal to 32 bytes
+        /// </summary>
         [MaybeNull]
         string SasTokenSecret { get; }
 

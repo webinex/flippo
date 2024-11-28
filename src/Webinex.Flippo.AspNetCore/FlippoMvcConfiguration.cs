@@ -9,15 +9,32 @@ namespace Webinex.Flippo.AspNetCore
 {
     public interface IFlippoMvcConfiguration
     {
+        /// <summary>
+        /// Uses provided schema and policy in <see cref="IFlippoMvcSettings"/> for authorization.
+        /// Will be ignored when <see cref="UseAllowAnonymousController"/> is called
+        /// </summary>
         IFlippoMvcConfiguration UsePolicy([NotNull] string schema, [NotNull] string policy);
 
+        /// <summary>
+        /// Registers custom controller. Controller must be inherited from <see cref="FlippoControllerBase"/>
+        /// </summary>
+        IFlippoMvcConfiguration UseController(Type controllerType);
+
+        /// <summary>
+        /// Registers custom controller. Controller must be derived from <see cref="FlippoControllerBase"/>
+        /// </summary>
+        IFlippoMvcConfiguration UseController<TController>() where TController : FlippoControllerBase;
+
+        /// <summary>
+        /// Registers anonymous controller, authorization checks will be skipped
+        /// </summary>
         IFlippoMvcConfiguration UseAllowAnonymousController();
     }
 
     internal class FlippoMvcConfiguration : IFlippoMvcConfiguration, IFlippoMvcSettings
     {
         private readonly IMvcBuilder _mvcBuilder;
-        private bool _allowAnonymousController = false;
+        private Type _controllerType = typeof(FlippoController);
 
         public FlippoMvcConfiguration(IMvcBuilder mvcBuilder)
         {
@@ -32,9 +49,24 @@ namespace Webinex.Flippo.AspNetCore
             return this;
         }
 
+        public IFlippoMvcConfiguration UseController(Type controllerType)
+        {
+            if (!controllerType.IsAssignableTo(typeof(FlippoControllerBase)))
+                throw new ArgumentException($"Controller must be derived from {nameof(FlippoControllerBase)}");
+
+            _controllerType = controllerType;
+            return this;
+        }
+
+        public IFlippoMvcConfiguration UseController<TController>() where TController : FlippoControllerBase
+        {
+            _controllerType = typeof(TController);
+            return this;
+        }
+
         public IFlippoMvcConfiguration UseAllowAnonymousController()
         {
-            _allowAnonymousController = true;
+            _controllerType = typeof(AnonymousFlippoControllerBase);
             return this;
         }
 
@@ -53,13 +85,12 @@ namespace Webinex.Flippo.AspNetCore
             CodedResults.Success(new EntityTagHeaderValue("\"" + reference.ToLowerInvariant() + "\""));
 
         public Func<HttpContext, string, string, CodedResult<bool>> ETagValid { get; set; } = (_, reference, etag) =>
-            CodedResults.Success(string.Equals(reference, etag.Substring(1, etag.Length - 2), StringComparison.InvariantCultureIgnoreCase));
+            CodedResults.Success(string.Equals(reference, etag.Substring(1, etag.Length - 2),
+                StringComparison.InvariantCultureIgnoreCase));
 
         internal void Complete()
         {
-            _mvcBuilder.AddController(_allowAnonymousController
-                ? typeof(AnonymousFlippoControllerBase)
-                : typeof(FlippoController));
+            _mvcBuilder.AddController(_controllerType);
         }
     }
 }
