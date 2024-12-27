@@ -26,7 +26,7 @@ namespace Webinex.Flippo.AspNetCore
 
         [HttpPost("{reference?}")]
         public virtual async Task<IActionResult> StoreAsync(
-            [FromForm(Name = "file")] IFormFile file,
+            IFormFile file,
             string reference,
             [FromQuery] bool replace)
         {
