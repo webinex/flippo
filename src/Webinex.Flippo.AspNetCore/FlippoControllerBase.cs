@@ -171,7 +171,7 @@ namespace Webinex.Flippo.AspNetCore
                 return false;
             }
 
-            Response.Headers.Add(HeaderNames.ETag, etagResult.Payload.ToString());
+            Response.Headers[HeaderNames.ETag] = etagResult.Payload.ToString();
             return true;
         }
 
@@ -188,7 +188,7 @@ namespace Webinex.Flippo.AspNetCore
                 return false;
             }
 
-            Response.Headers.Add(HeaderNames.CacheControl, cacheControlHeaderValueResult.Payload.ToString());
+            Response.Headers[HeaderNames.CacheControl] = cacheControlHeaderValueResult.Payload.ToString();
             return true;
         }
 
@@ -196,7 +196,7 @@ namespace Webinex.Flippo.AspNetCore
         {
             var contentDisposition = new ContentDisposition
                 { Inline = true, FileName = content.FileName, Size = content.Stream.Length }.ToString();
-            Response.Headers.Add(HeaderNames.ContentDisposition, contentDisposition);
+            Response.Headers[HeaderNames.ContentDisposition] = contentDisposition;
         }
 
         protected virtual IAuthorizationService AuthorizationService =>
