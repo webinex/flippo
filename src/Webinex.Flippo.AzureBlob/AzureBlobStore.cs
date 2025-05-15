@@ -126,8 +126,8 @@ namespace Webinex.Flippo.AzureBlob
             {
                 return new Dictionary<string, string>
                 {
-                    [nameof(FileName)] = FileName,
-                    [nameof(MimeType)] = MimeType,
+                    [nameof(FileName)] = EscapeHeader(FileName),
+                    [nameof(MimeType)] = EscapeHeader(MimeType),
                 };
             }
 
@@ -139,12 +139,22 @@ namespace Webinex.Flippo.AzureBlob
                 metadata.TryGetValue(nameof(FileName), out var fileName);
                 metadata.TryGetValue(nameof(MimeType), out var mimeType);
 
-                return new Metadata { FileName = fileName, MimeType = mimeType };
+                return new Metadata { FileName = UnescapeHeader(fileName), MimeType = UnescapeHeader(mimeType) };
             }
 
             public static Metadata From(FlippoStoreBlobArgs args)
             {
                 return new Metadata { FileName = args.FileName, MimeType = args.MimeType };
+            }
+
+            private static string EscapeHeader(string value)
+            {
+                return Uri.EscapeDataString(value);
+            }
+
+            private static string UnescapeHeader(string value)
+            {
+                return Uri.UnescapeDataString(value);
             }
         }
     }
